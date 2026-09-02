@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoMaster - Simulation & Académie</title>
+    <!-- Chart.js pour l'affichage graphique -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #f3ba2f;
+            --bg-dark: #0b0e11;
+            --card-bg: #1e2329;
+            --text-main: #eaecef;
+            --text-muted: #848e9c;
+            --green: #0ecb81;
+            --red: #f6465d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2b313a;
+        }
+
+        .brand {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .creator-tag {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Auth Screen */
+        .auth-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 400px;
+            margin: 50px auto;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        input[type="email"] {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 4px;
+            border: 1px solid #474d57;
+            background: #2b313a;
+            color: #fff;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            background: var(--primary);
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        /* Course Screen */
+        .course-container {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 8px;
+            max-height: 70vh;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+
+        .course-container h1, .course-container h2, .course-container h3 {
+            color: var(--primary);
+            margin: 15px 0 10px 0;
+        }
+
+        .course-container p {
+            margin-bottom: 12px;
+            color: #d1d4dc;
+        }
+
+        .course-footer {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        /* Simulator Screen */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .wallet-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .market-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .chart-box {
+            position: relative;
+            height: 300px;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .trade-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn-buy {
+            background: var(--green);
+            color: #fff;
+        }
+
+        .btn-sell {
+            background: var(--red);
+            color: #fff;
+        }
+
+        .trade-input {
+            width: 100%;
+            padding: 10px;
+            background: #2b313a;
+            border: 1px solid #474d57;
+            color: white;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-top: 1px solid #2b313a;
+            background: var(--card-bg);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">CryptoMaster</div>
+        <div class="creator-tag">Fait par la boutique de Ozias</div>
+    </header>
+
+    <div class="container">
+        
+        <!-- ÉCRAN 1 : CONNEXION E-MAIL -->
+        <div id="auth-screen" class="screen active">
+            <div class="auth-card">
+                <h2>Bienvenue sur CryptoMaster</h2>
+                <p style="color: var(--text-muted); margin-top: 8px;">Accédez à l'académie et au simulateur</p>
+                <form id="auth-form">
+                    <input type="email" id="user-email" placeholder="Entrez votre adresse email..." required>
+                    <button type="submit">Se connecter / Continuer</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ÉCRAN 2 : COURS THÉORIQUE COMPLET -->
+        <div id="course-screen" class="screen">
+            <h2 style="margin-bottom: 15px;">Académie Crypto : Formation Complete</h2>
+            <div class="course-container">
+                <h1>Module 1 : Introduction aux Cryptomonnaies</h1>
+                <p>Bienvenue dans le guide complet sur les cryptomonnaies et la technologie Blockchain. Ce cours a été spécialement rédigé pour vous donner une compréhension intégrale et autonome des marchés financiers numériques avant de passer au trading pratique dans le simulateur.</p>
+                
+                <h2>1. Qu'est-ce qu'une Cryptomonnaie ?</h2>
+                <p>Une cryptomonnaie est une forme de monnaie numérique ou virtuelle qui utilise la cryptographie pour sécuriser les transactions. Contrairement aux monnaies traditionnelles émises par les banques centrales (appelées monnaies fiduciaires comme le Dollar, l'Euro ou le Franc CFA), les cryptomonnaies fonctionnent généralement sur des réseaux décentralisés basés sur la technologie Blockchain.</p>
+                <p>La décentralisation signifie qu'aucune entité unique, gouvernement ou institution financière ne contrôle le réseau. Les transactions sont vérifiées par les utilisateurs du réseau eux-mêmes via des algorithmes mathématiques complexes.</p>
+
+                <h2>2. Comprendre la Blockchain</h2>
+                <p>La Blockchain (ou chaîne de blocs) est la technologie sous-jacente des cryptomonnaies. Il s'agit d'un registre public, immuable et distribué où toutes les transactions sont enregistrées dans l'ordre chronologique.</p>
+                <p>Chaque "bloc" contient un groupe de transactions. Une fois qu'un bloc est rempli, il est lié de manière cryptographique au bloc précédent, formant ainsi une chaîne. Cette structure rend pratiquement impossible toute falsification : pour modifier une transaction passée, un pirate devrait modifier l'intégralité de la chaîne sur des milliers d'ordinateurs simultanément.</p>
+
+                <h2>3. Bitcoin, Ethereum et Altcoins</h2>
+                <p><strong>Bitcoin (BTC) :</strong> Créé en 2009 par l'anonyme Satoshi Nakamoto, le Bitcoin est la première et la plus populaire des cryptomonnaies. Il est souvent considéré comme de l'or numérique en raison de sa quantité limitée (seulement 21 millions de Bitcoins existeront au total).</p>
+                <p><strong>Ethereum (ETH) :</strong> Lancé en 2015 par Vitalik Buterin, Ethereum a introduit le concept de "Contrats Intelligents" (Smart Contracts). Il ne sert pas seulement de monnaie, mais d'une plateforme permettant de créer des applications décentralisées (dApps).</p>
+                <p><strong>Les Altcoins :</strong> Ce terme désigne toutes les autres cryptomonnaies alternatives au Bitcoin (Cardano, Solana, Ripple, etc.).</p>
+
+                <h2>4. Comment fonctionne la Variation des Prix (Volatilité) ?</h2>
+                <p>Le prix des cryptomonnaies varie en temps réel selon la loi fondamentale de <strong>l'offre et de la demande</strong> :</p>
+                <ul>
+                    <li>Si plus de personnes veulent **acheter** une crypto que de personnes prêtes à la **vendre**, le prix **monte**.</li>
+                    <li>Si plus de personnes veulent **vendre** qu'acheter, le prix **chute**.</li>
+                </ul>
+                <p>Cette fluctuation rapide est appelée la <strong>volatilité</strong>. La volatilité offre de grandes opportunités de profits, mais elle comporte également des risques élevés si le marché baisse brusquement.</p>
+
+                <h2>5. Ordres d'Achat, de Vente et Gestion de Portefeuille</h2>
+                <p>Pour réussir dans le trading de cryptomonnaies, un investisseur doit maîtriser la gestion des risques :</p>
+                <p>1. **Ne jamais investir de l'argent vital :** On n'investit que ce qu'on peut se permettre de perdre.</p>
+                <p>2. **Prendre ses profits (Take Profit) :** Vendre une partie de ses actifs lorsque le prix augmente pour sécuriser ses gains.</p>
+                <p>3. **Gestion des émotions :** Éviter le FOMO (*Fear Of Missing Out* / la peur de rater une opportunité) et le FUD (*Fear, Uncertainty, Doubt* / la panique causée par les mauvaises nouvelles).</p>
+
+                <h2>Résumé et Passage Pratique</h2>
+                <p>Vous avez maintenant assimilé les bases théoriques indispensables de l'écosystème crypto. Il est temps d'appliquer ces concepts dans notre simulateur en temps réel. Vous disposez d'un capital virtuel de 10 000 USDT. Observez le graphique, analysez la tendance et effectuez vos premiers ordres d'achat et de vente sans aucun risque financier.</p>
+            </div>
+            <div class="course-footer">
+                <button id="btn-start-sim">J'ai compris le cours, passer au Simulateur 🚀</button>
+            </div>
+        </div>
+
+        <!-- ÉCRAN 3 : SIMULATEUR DE TRADING EN TEMPS RÉEL -->
+        <div id="sim-screen" class="screen">
+            <div class="dashboard">
+                <div class="wallet-card">
+                    <div>
+                        <small style="color: var(--text-muted);">Solde Virtuel (USDT)</small>
+                        <h2 id="usdt-balance">10 000.00 $</h2>
+                    </div>
+                    <div>
+                        <small style="color: var(--text-muted);">Portefeuille Bitcoin (BTC)</small>
+                        <h2 id="btc-balance">0.0000 BTC</h2>
+                    </div>
+                </div>
+
+                <div class="market-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3>Marché : BTC / USDT</h3>
+                        <h2 id="btc-price" style="color: var(--primary);">45 000.00 $</h2>
+                    </div>
+                    
+                    <div class="chart-box">
+                        <canvas id="cryptoChart"></canvas>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <input type="number" id="trade-amount" class="trade-input" placeholder="Montant en USDT..." step="10">
+                        <div class="trade-actions">
+                            <button id="btn-buy" class="btn-buy">Acheter BTC</button>
+                            <button id="btn-sell" class="btn-sell">Vendre BTC</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>Fait par la boutique de Ozias — Modèle Éducatif Décentralisé</p>
+    </footer>
+
+    <script>
+        // Gestion de l'état de l'application
+        let userEmail = "";
+        let usdtBalance = 10000.00;
+        let btcBalance = 0.0000;
+        let currentBtcPrice = 45000.00;
+        let priceHistory = [44800, 44900, 44850, 45100, 45000];
+        let chart;
+
+        // Éléments DOM
+        const authScreen = document.getElementById('auth-screen');
+        const courseScreen = document.getElementById('course-screen');
+        const simScreen = document.getElementById('sim-screen');
+        const authForm = document.getElementById('auth-form');
+        const btnStartSim = document.getElementById('btn-start-sim');
+
+        // Étape 1 : Connexion Email
+        authForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const emailInput = document.getElementById('user-email').value;
+            if (emailInput) {
+                userEmail = emailInput;
+                authScreen.classList.remove('active');
+                courseScreen.classList.add('active');
+            }
+        });
+
+        // Étape 2 : Transition du cours au simulateur
+        btnStartSim.addEventListener('click', () => {
+            courseScreen.classList.remove('active');
+            simScreen.classList.add('active');
+            initChart();
+            startMarketSimulation();
+        });
+
+        // Initialisation du Graphique dynamique
+        function initChart() {
+            const ctx = document.getElementById('cryptoChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['10:00', '10:05', '10:10', '10:15', '10:20'],
+                    datasets: [{
+                        label: 'Prix BTC (USDT)',
+                        data: priceHistory,
+                        borderColor: '#f3ba2f',
+                        backgroundColor: 'rgba(243, 186, 47, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: '#2b313a' } },
+                        y: { grid: { color: '#2b313a' } }
+                    }
+                }
+            });
+        }
+
+        // Étape 3 : Simulation des conditions vraies du marché crypto
+        function startMarketSimulation() {
+            setInterval(() => {
+                // Variation aléatoire du prix entre -1.5% et +1.5%
+                const variation = (Math.random() - 0.49) * 0.03;
+                currentBtcPrice = Math.max(1000, currentBtcPrice * (1 + variation));
+                
+                // Mettre à jour l'affichage du prix
+                document.getElementById('btc-price').innerText = currentBtcPrice.toFixed(2) + ' $';
+
+                // Mettre à jour le graphique
+                const now = new Date();
+                const timeStr = now.getHours() + ':' + (now.getMinutes()<10?'0':'') + now.getMinutes() + ':' + (now.getSeconds()<10?'0':'') + now.getSeconds();
+                
+                chart.data.labels.push(timeStr);
+                chart.data.datasets[0].data.push(currentBtcPrice);
+
+                if (chart.data.labels.length > 10) {
+                    chart.data.labels.shift();
+                    chart.data.datasets[0].data.shift();
+                }
+
+                chart.update();
+            }, 3000); // Mise à jour toutes les 3 secondes
+        }
+
+        // Actions d'achat et de vente
+        document.getElementById('btn-buy').addEventListener('click', () => {
+            const amount = parseFloat(document.getElementById('trade-amount').value);
+            if (isNaN(amount) || amount <= 0) return alert('Entrez un montant valide');
+            if (amount > usdtBalance) return alert('Solde USDT insuffisant !');
+
+            const btcBought = amount / currentBtcPrice;
+            usdtBalance -= amount;
+            btcBalance += btcBought;
+
+            updateWalletUI();
+        });
+
+        document.getElementById('btn-sell').addEventListener('click', () => {
+            const amount = parseFloat(document.getElementById('trade-amount').value);
+            if (isNaN(amount) || amount <= 0) return alert('Entrez un montant valide');
+
+            const btcToSell = amount / currentBtcPrice;
+            if (btcToSell > btcBalance) return alert('Solde BTC insuffisant !');
+
+            btcBalance -= btcToSell;
+            usdtBalance += amount;
+
+            updateWalletUI();
+        });
+
+        function updateWalletUI() {
+            document.getElementById('usdt-balance').innerText = usdtBalance.toFixed(2) + ' $';
+            document.getElementById('btc-balance').innerText = btcBalance.toFixed(4) + ' BTC';
+            document.getElementById('trade-amount').value = '';
+        }
+    </script>
+</body>
+</html>
